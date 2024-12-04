@@ -123,7 +123,6 @@ void gradient_descent(double **x,double **x_egitim,double **x_test,double *w,dou
     for(i=0;i<785;i++){
         w_izleme[0][785] = w[i];
     }
-
     for(iterasyon = 1;iterasyon <101;iterasyon++){
         gradient_descent_w_duzenleme(w,x_egitim,hedef);
         w_izleme_duzenleme(w,w_izleme,iterasyon);
@@ -159,37 +158,34 @@ void gradient_descent(double **x,double **x_egitim,double **x_test,double *w,dou
 int main(){
 
     int i;
-    double **x = (double **)malloc(200*sizeof(double *));
+    double **x = (double **)calloc(200,sizeof(double *));
     for(i=0;i<200;i++){
-        x[i] = (double *)malloc(785*sizeof(double));
+        x[i] = (double *)calloc(785,sizeof(double));
     }
-    double *w = malloc(785*sizeof(double));
+    double *w = calloc(785,sizeof(double));
     double **x_egitim;
-    x_egitim = (double **)malloc(160*sizeof(double *));
+    x_egitim = (double **)calloc(160,sizeof(double *));
     for(i=0;i<160;i++){
-        x_egitim[i] = (double *)malloc(785*sizeof(double));
+        x_egitim[i] = (double *)calloc(785,sizeof(double));
     }
     double **x_test;
-    x_test = (double **)malloc(40*sizeof(double *));
+    x_test = (double **)calloc(40,sizeof(double *));
     for(i=0;i<40;i++){
-        x_test[i] = (double *)malloc(785*sizeof(double));
+        x_test[i] = (double *)calloc(785,sizeof(double));
     }
     double **w_izleme;
-    w_izleme = (double **)malloc(101*sizeof(double *));
-    for(i=0;i<40;i++){
-        w_izleme[i] = (double *)malloc(785*sizeof(double));
+    w_izleme = (double **)calloc(101,sizeof(double *));
+    for(i=0;i<101;i++){
+        w_izleme[i] = (double *)calloc(785,sizeof(double));
     }
-    int *hedef = malloc(200*sizeof(int));
-
-
-    const char *filename = "data.csv";
+    int *hedef = calloc(200,sizeof(int));
+    //const char *filename = "data.csv";
 
     hedef_duzenleme(hedef);
-    read_csv(filename, x);
+    //read_csv(filename, x);
     egitim_test_ayristirma(x,x_egitim,x_test);
     gradient_descent(x,x_egitim,x_test,w,w_izleme,hedef);
     
-
-
+    printf("calisiyo");
     return 0;
 }
