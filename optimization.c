@@ -5,6 +5,17 @@
 
 #define N 28 // Görüntü boyutu NxN
 
+void read_csv(const char *filename, double **matrix);
+void generate_w(double *w,double baslangic);
+double derivative_loss(double w,double x,int y);
+void y_edit(int *y);
+void separation_train_Test(double **x,double **x_train,double **x_test);
+void w_history_edit(double *w, double **w_history, int iteration );
+void gradient_descent_w_edit(double *w,double **x_train,int *y );
+void gradient_descent(double **x,double **x_train,double **x_test,double *w,double **w_history,int *y);
+void Adam_Algorithm(double **x,double *w,double **x_train,double **w_history,int *y);
+
+
 void read_csv(const char *filename, double **matrix) {
     FILE *file = fopen(filename, "r");
     if (file == NULL) {
@@ -110,6 +121,28 @@ void gradient_descent_w_edit(double *w,double **x_train,int *y ){
 
         
     }
+
+}
+
+double calculate_loss(double *w,double **x_train,int *y){
+    double sum, sum_loss = 0;
+    int i,j;
+
+    for(i=0;i<160;i++){
+        sum = 0;
+        for(j=0;j<785;j++){
+            sum += w[j]*x_train[i][j];
+        }
+
+        if(i<80){
+            sum_loss += pow((y[i]-tanh(sum)),2);
+        }else{
+            sum_loss += pow((y[i+20]-tanh(sum)),2);
+        }
+    }
+
+    return (sum_loss / 160.0);
+
 
 }
 
