@@ -15,9 +15,9 @@ void y_edit(int *y);
 void separation_train_Test(double **x,double **x_train,double **x_test);
 void w_history_edit(double *w, double **w_history, int iteration );
 void gradient_descent_w_edit(double *w,double **x_train,int *y );
-void gradient_descent(double **x,double **x_train,double **x_test,double *w,double **w_history,int *y,double loss_history[101]);
-void Adam_Algorithm(double **x,double *w,double **x_train,double **x_test,double **w_history,int *y,double loss_history[101]);
-void stochastic_gradient(double **x,double **x_train,double **x_test, double *w, double **w_history,int *y,double loss_history[101]);
+void gradient_descent(double **x,double **x_train,double **x_test,double *w,double **w_history,int *y,double loss_history[101],double time_history[101]);
+void Adam_Algorithm(double **x,double *w,double **x_train,double **x_test,double **w_history,int *y,double loss_history[101],double time_history[101]);
+void stochastic_gradient(double **x,double **x_train,double **x_test, double *w, double **w_history,int *y,double loss_history[101],double time_history[101]);
 
 void read_csv(const char *filename, double **matrix) {
     FILE *file = fopen(filename, "r");
@@ -174,11 +174,11 @@ double calculate_loss(double *w,double **x_train,int *y){
 
 }
 
-void gradient_descent(double **x,double **x_train,double **x_test,double *w,double **w_history,int *y,double loss_history[101]){
+void gradient_descent(double **x,double **x_train,double **x_test,double *w,double **w_history,int *y,double loss_history[101],double time_history[101]){
     int i,j,iteration;
-    double sum,accuracy_rate;
+    double sum,accuracy_rate,duration;
     int result[40];
-
+    clock_t start,end;
 
 
     for(i=0;i<785;i++){
@@ -186,13 +186,25 @@ void gradient_descent(double **x,double **x_train,double **x_test,double *w,doub
     }
 
     loss_history[0] = calculate_loss(w,x_train,y); 
-
+    time_history[0] = 0;
+    int flag = 0;
     for(iteration = 1;iteration <101;iteration++){
-
+        start = clock();
         gradient_descent_w_edit(w,x_train,y);
         w_history_edit(w,w_history,iteration);
 
         loss_history[iteration] = calculate_loss(w,x_train,y);
+        end = clock();
+
+        duration = ((double)(end - start)) / CLOCKS_PER_SEC;
+
+        if(flag == 0){
+            time_history[1] = duration;
+            flag = 1;
+        }else{
+            time_history[iteration] = time_history[iteration-1] + duration;
+        }
+
     }
     
     for(i=0;i<40;i++){
@@ -205,7 +217,6 @@ void gradient_descent(double **x,double **x_train,double **x_test,double *w,doub
             
             if(tanh(sum) >= 0.5){
                 result[i] = 1;
-                printf("Doğru buldi\n");
             }else{
                 result[i] = 0;
             }
@@ -214,7 +225,6 @@ void gradient_descent(double **x,double **x_train,double **x_test,double *w,doub
         }else{
             if(tanh(sum) <= -0.5){
                 result[i] = 1;
-                printf("Doğru buldi\n");
             }else{
                 result[i] = 0;
             }
@@ -231,18 +241,35 @@ void gradient_descent(double **x,double **x_train,double **x_test,double *w,doub
     
 }
 
-void stochastic_gradient(double **x,double **x_train,double **x_test, double *w, double **w_history,int *y,double loss_history[101]){
-    int i,j,iteration,result[40];
-    double sum,accuracy_rate;
+void stochastic_gradient(double **x,double **x_train,double **x_test, double *w, double **w_history,int *y,double loss_history[101],double time_history[101]){
+    int i,j,iteration,result[40],flag = 0;
+    double sum,accuracy_rate,duration;
+    clock_t start,end;
 
     for(i=0;i<785;i++){
         w_history[0][785] = w[i];
     }
+
+    loss_history[0] = calculate_loss(w,x_train,y);
+    time_history[0] = 0;
+
     for(iteration = 1;iteration <101;iteration++){
+        start = clock();
         stochastic_gradiant_w_edit(w,x_train,y);
         w_history_edit(w,w_history,iteration);
 
         loss_history[iteration] = calculate_loss(w,x_train,y);
+        end = clock();
+
+        duration = ((double)(end - start)) / CLOCKS_PER_SEC;
+
+        if(flag == 0){
+            time_history[1] = duration;
+            flag = 1;
+        }else{
+            time_history[iteration] = time_history[iteration-1] + duration;
+        }
+
     }
     for(i=0;i<40;i++){
         sum =0;
@@ -280,16 +307,19 @@ void stochastic_gradient(double **x,double **x_train,double **x_test, double *w,
 }
 
 
-void Adam_Algorithm(double **x,double *w,double **x_train,double **x_test,double **w_history,int *y,double loss_history[101]){
-    double learningRate = 0.001,b1 = 0.9,b2 = 0.999,e = pow(10,-8),gt,mt=0,vt=0,sum,accuracy_rate;
-    int i,j,iteration,result[40];
+void Adam_Algorithm(double **x,double *w,double **x_train,double **x_test,double **w_history,int *y,double loss_history[101],double time_history[101]){
+    double learningRate = 0.001,b1 = 0.9,b2 = 0.999,e = pow(10,-8),gt,mt=0,vt=0,sum,accuracy_rate,duration;
+    int i,j,iteration,result[40],flag=0;
+    clock_t start,end;
 
     for(i=0;i<785;i++){
         w_history[0][785] = w[i];
     }
     loss_history[0] = calculate_loss(w,x_train,y);
-
+    time_history[0] = 0;
     for(iteration = 1;iteration<101;iteration++){
+        start = clock();
+
         j = rand() % 160;
 
         for(i=0;i<785;i++){
@@ -310,6 +340,16 @@ void Adam_Algorithm(double **x,double *w,double **x_train,double **x_test,double
 
         loss_history[iteration] = calculate_loss(w,x_train,y);
 
+        end = clock();
+
+        duration = ((double)(end - start)) / CLOCKS_PER_SEC;
+
+        if(flag == 0){
+            time_history[1] = duration;
+            flag = 1;
+        }else{
+            time_history[iteration] = time_history[iteration-1] + duration;
+        }
 
     }
 
@@ -360,7 +400,7 @@ int main(){
 
     srand(time(0));
     int i;
-    double loss_history[101];
+    double loss_history[101],time_history[101];
 
     double **x = (double **)calloc(200,sizeof(double *));
     for(i=0;i<200;i++){
@@ -394,12 +434,16 @@ int main(){
     
     separation_train_Test(x,x_train,x_test);
 
-    //gradient_descent(x,x_train,x_test,w,w_history,y,loss_history);
-    //stochastic_gradient(x,x_train,x_test,w,w_history,y,loss_history);
-    //Adam_Algorithm(x,w,x_train,x_test,w_history,y,loss_history);
-    
-    /*for (int j = 0; j < 101; j++) {
-            printf("%.10f \n", loss_history[j]);  
+    //gradient_descent(x,x_train,x_test,w,w_history,y,loss_history,time_history);
+    //stochastic_gradient(x,x_train,x_test,w,w_history,y,loss_history,time_history);
+    //Adam_Algorithm(x,w,x_train,x_test,w_history,y,loss_history,time_history);
+
+    /*for(i=0;i<101;i++){
+        printf("%.10f \n", time_history[i]); 
+    }
+    */
+    /*for (i = 0; i < 101; i++) {
+            printf("%.10f \n", loss_history[i]);  
         }
     */
 
