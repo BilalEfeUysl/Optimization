@@ -233,7 +233,7 @@ void gradient_descent(double **x,double **x_train,double **x_test,double *w,doub
 
     sum = 0;
 
-    for(i<0;i<40;i++){
+    for(i=0;i<40;i++){
         sum += result[i];
     }
 
@@ -297,7 +297,7 @@ void stochastic_gradient(double **x,double **x_train,double **x_test, double *w,
 
     
     sum = 0;
-    for(i<0;i<40;i++){
+    for(i=0;i<40;i++){
         sum += result[i];
     }
 
@@ -344,7 +344,7 @@ void Adam_Algorithm(double **x,double *w,double **x_train,double **x_test,double
 
         duration = ((double)(end - start)) / CLOCKS_PER_SEC;
 
-        if(flag == 0){
+        if(iteration == 1){
             time_history[1] = duration;
             flag = 1;
         }else{
@@ -379,7 +379,7 @@ void Adam_Algorithm(double **x,double *w,double **x_train,double **x_test,double
 
     sum = 0;
 
-    for(i<0;i<40;i++){
+    for(i=0;i<40;i++){
         sum += result[i];
     }
 
@@ -423,6 +423,7 @@ int main(){
         w_history[i] = (double *)calloc(785,sizeof(double));
     }
     int *y = calloc(200,sizeof(int));
+
     const char *filename = "data.csv";
 
 
@@ -434,19 +435,29 @@ int main(){
     
     separation_train_Test(x,x_train,x_test);
 
-    //gradient_descent(x,x_train,x_test,w,w_history,y,loss_history,time_history);
+    gradient_descent(x,x_train,x_test,w,w_history,y,loss_history,time_history);
     //stochastic_gradient(x,x_train,x_test,w,w_history,y,loss_history,time_history);
     //Adam_Algorithm(x,w,x_train,x_test,w_history,y,loss_history,time_history);
 
-    /*for(i=0;i<101;i++){
+    /*
+    for(i=0;i<101;i++){
         printf("%.10f \n", time_history[i]); 
     }
     */
-    /*for (i = 0; i < 101; i++) {
+    for (i = 0; i < 101; i++) {
             printf("%.10f \n", loss_history[i]);  
         }
-    */
+    
 
-    printf("calisiyo");
+    /*FILE *fptr = fopen("weights_history.txt", "w");
+    for (int i = 0; i < 101; i++) {
+        for (int j = 0; j < 785; j++) {
+            fprintf(fptr, "%f ", w_history[i][j]);
+        }
+    fprintf(fptr, "\n");
+    }
+
+    fclose(fptr);
+    */
     return 0;
 }
